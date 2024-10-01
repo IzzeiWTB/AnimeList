@@ -1,0 +1,169 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #2400f3;
+    margin: 0;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+}
+
+#search {
+    display: block;
+    margin: 20px auto;
+    width: 100%;
+    max-width: 600px;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+#genre-filter {
+    display: block;
+    margin: 20px auto;
+    padding: 10px;
+    font-size: 16px;
+    width: 100%;
+    max-width: 600px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+
+.anime-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+.anime-item {
+    background: #fff;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+    position: relative;
+    overflow: hidden;
+}
+
+.anime-image:hover + .anime-genres {
+    display: block;
+}
+
+.anime-item:hover .anime-genres {
+    display: block;
+}
+.anime-item:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.anime-image {
+    width: 100%;
+    height: auto;
+    max-height: 250px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+.anime-genres {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    text-align: center;
+    padding: 10px;
+    font-size: 14px;
+    display: none;
+}
+
+h3 {
+    font-size: 18px;
+    margin: 10px 0;
+}
+
+p {
+    font-size: 14px;
+    color: #555;
+}
+
+.favorite {
+    color: red;
+    cursor: pointer;
+    font-size: 24px;
+    transition: 0.3s;
+}
+
+.favorite:hover {
+    color: #ff6666;
+}
+
+.load-more {
+    display: block;
+    width: 200px;
+    margin: 20px auto;
+    padding: 10px;
+    text-align: center;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.load-more:hover {
+    background: #0056b3;
+}
+
+h1 {
+    background-color: #007bff;
+    border: none;
+    border-radius: 90%;
+    padding: 1%;
+    width: 300px;
+    margin: 0 auto; /* Centraliza horizontalmente */
+    text-align: center; /* Centraliza o texto dentro do h1 */
+}
+
+
+@media (max-width: 768px) {
+    .anime-list {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+    .anime-item {
+        padding: 10px;
+    }
+    h3 {
+        font-size: 16px;
+    }
+    p {
+        font-size: 12px;
+    }
+    .favorite {
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .anime-list {
+        grid-template-columns: 1fr;
+    }
+    .anime-item {
+        padding: 8px;
+    }
+    .favorite {
+        font-size: 18px;
+    }
+    h3 {
+        font-size: 14px;
+    }
+    p {
+        font-size: 12px;
+    }
+}
