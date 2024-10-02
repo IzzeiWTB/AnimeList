@@ -1,19 +1,30 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anime List</title>
+    <title>Lista de Animes</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>MyAnimeList(da Deep Web)</h1>
-    <input type="text" id="search" placeholder="Procurando por anime...">
-    <select id="genre-filter"></select>
-        <option value=""></option>
+    <h1>MyAnimeList (da Deep Web)</h1>
+
+    <input type="text" id="search" placeholder="Procurar por anime...">
+
+    <select id="genre-filter">
+        <option value="">Todos os Gêneros</option>
     </select>
+
+    <!-- Botão para mostrar animes favoritados -->
+    <button id="show-favorites" class="show-favorites">Mostrar Favoritos</button>
+
+    <!-- Lista de Animes -->
     <div class="anime-list" id="anime-list"></div>
+
+    <!-- Botão para carregar mais animes -->
     <button id="load-more" class="load-more">Carregar Mais</button>
+
+    <!-- Script JavaScript -->
     <script src="script.js"></script>
 </body>
 </html>
