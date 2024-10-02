@@ -1,26 +1,27 @@
-// Variáveis globais
-let listaAnimes = [];  // Lista de animes
-let favoritos = JSON.parse(localStorage.getItem('favoritos')) || [];  // Recupera animes favoritados do armazenamento local
-let paginaAtual = 1;  // Página atual para carregar mais animes
-let listaGeneros = [];  // Lista de gêneros para o filtro
+let listaAnimes = [];
+let favoritos = JSON.parse(localStorage.getItem('favoritos')) || [];
+let paginaAtual = 1;
+let listaGeneros = [];
+let carregandoMais = false;
 
-// Função para buscar animes da API
 async function buscarAnimes(pagina = 1) {
     try {
+        carregandoMais = true;
         const resposta = await fetch(`https://api.jikan.moe/v4/anime?page=${pagina}`);
         const dados = await resposta.json();
         listaAnimes = [...listaAnimes, ...dados.data];
-        exibirAnimes(dados.data);
-        extrairGeneros(dados.data);
+        exibirAnimes(listaAnimes);
+        extractGenres(dados.data);
+        carregandoMais = false;
     } catch (erro) {
         console.log("Erro ao buscar animes:", erro);
+        carregandoMais = false;
     }
 }
 
-// Função para exibir animes na tela
 function exibirAnimes(animes) {
     const elementoListaAnimes = document.getElementById('anime-list');
-    elementoListaAnimes.innerHTML = '';  // Limpar o container para exibir animes filtrados
+    elementoListaAnimes.innerHTML = '';
 
     animes.forEach(anime => {
         const itemAnime = document.createElement('div');
@@ -31,74 +32,80 @@ function exibirAnimes(animes) {
         itemAnime.innerHTML = `
             <img src="${anime.images.jpg.image_url}" class="anime-image" alt="${anime.title}">
             <div class="anime-genres">${generos}</div>
-            <h3>${anime.title}</h3>
+            <div class="anime-title">
+                <h3>${anime.title}</h3>
+                <span class="favorite" data-id="${anime.mal_id}" onclick="alternarFavorito('${anime.mal_id}', event)">${favoritos.includes(String(anime.mal_id)) ? '❤️' : '🤍'}</span>
+            </div>
             <p>${anime.synopsis ? anime.synopsis.substring(0, 100) + '...' : 'Sem descrição disponível'}</p>
-            <span class="favorite" onclick="alternarFavorito('${anime.mal_id}')">${favoritos.includes(anime.mal_id) ? '❤️' : '🤍'}</span>
         `;
 
-        // Adiciona evento de clique para exibir detalhes do anime
         itemAnime.addEventListener('click', () => mostrarDetalhes(anime));
         elementoListaAnimes.appendChild(itemAnime);
     });
+
+    atualizarFavoritos();
 }
 
-// Função para exibir detalhes do anime ao clicar
 function mostrarDetalhes(anime) {
     alert(`Título: ${anime.title}\nPontuação: ${anime.score}\nEpisódios: ${anime.episodes}\nSinopse: ${anime.synopsis}`);
 }
 
-// Função para adicionar ou remover favoritos
-function alternarFavorito(animeId) {
-    const indice = favoritos.indexOf(animeId);
-    if (indice > -1) {
-        favoritos.splice(indice, 1);  // Remove dos favoritos
+function alternarFavorito(animeId, event) {
+    event.stopPropagation();
+
+    animeId = String(animeId);
+    if (favoritos.includes(animeId)) {
+        favoritos = favoritos.filter(fav => fav !== animeId);
     } else {
-        favoritos.push(animeId);  // Adiciona aos favoritos
+        favoritos.push(animeId);
     }
+
     localStorage.setItem('favoritos', JSON.stringify(favoritos));
-    atualizarFavoritos();
+
+    const elementoFavorito = event.target;
+    elementoFavorito.textContent = favoritos.includes(animeId) ? '❤️' : '🤍';
 }
 
-// Função para atualizar favoritos na interface
 function atualizarFavoritos() {
-    const itensAnime = document.querySelectorAll('.anime-item');
-    itensAnime.forEach(item => {
-        const id = item.querySelector('.favorite').getAttribute('onclick').split("'")[1];
-        item.querySelector('.favorite').textContent = favoritos.includes(Number(id)) ? '❤️' : '🤍';
+    const elementosFavorito = document.querySelectorAll('.favorite');
+    elementosFavorito.forEach(elemento => {
+        const id = elemento.getAttribute('data-id');
+        elemento.textContent = favoritos.includes(id) ? '❤️' : '🤍';
     });
 }
 
-// Função para extrair e exibir gêneros no filtro
-function extrairGeneros(animes) {
+function extractGenres(animes) {
     animes.forEach(anime => {
-        anime.genres.forEach(genero => {
-            if (!listaGeneros.includes(genero.name)) {
-                listaGeneros.push(genero.name);
+        anime.genres.forEach(genre => {
+            if (!listaGeneros.includes(genre.name)) {
+                listaGeneros.push(genre.name);
             }
         });
     });
 
-    const filtroGeneros = document.getElementById('genre-filter');
-    filtroGeneros.innerHTML = '<option value="">Todos os Gêneros</option>';
-    listaGeneros.forEach(genero => {
-        const opcao = document.createElement('option');
-        opcao.value = genero;
-        opcao.textContent = genero;
-        filtroGeneros.appendChild(opcao);
+    const genreFilter = document.getElementById('genre-filter');
+    genreFilter.innerHTML = '<option value="">Todos os Gêneros</option>';
+    listaGeneros.forEach(genre => {
+        const option = document.createElement('option');
+        option.value = genre;
+        option.textContent = genre;
+        genreFilter.appendChild(option);
     });
 }
 
-// Função para exibir apenas animes favoritados
 function exibirFavoritos() {
-    const animesFavoritos = listaAnimes.filter(anime => favoritos.includes(anime.mal_id));
-    exibirAnimes(animesFavoritos);
+    const animesFavoritos = listaAnimes.filter(anime => favoritos.includes(String(anime.mal_id)));
+    if (animesFavoritos.length > 0) {
+        exibirAnimes(animesFavoritos);
+    } else {
+        alert('Nenhum anime foi favoritado ainda.');
+    }
 }
 
-// Filtros e eventos
 document.getElementById('genre-filter').addEventListener('change', (e) => {
     const generoSelecionado = e.target.value;
     if (generoSelecionado === '') {
-        exibirAnimes(listaAnimes);  // Exibe todos os animes
+        exibirAnimes(listaAnimes);
     } else {
         const animesFiltrados = listaAnimes.filter(anime =>
             anime.genres.some(genero => genero.name === generoSelecionado)
@@ -120,5 +127,11 @@ document.getElementById('load-more').addEventListener('click', () => {
 
 document.getElementById('show-favorites').addEventListener('click', exibirFavoritos);
 
-// Carregar os animes iniciais
+window.addEventListener('scroll', () => {
+    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 50 && !carregandoMais) {
+        paginaAtual++;
+        buscarAnimes(paginaAtual);
+    }
+});
+
 buscarAnimes();
